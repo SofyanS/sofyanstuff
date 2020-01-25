@@ -3,12 +3,12 @@ from yaml import load
 import socket
 from sqlalchemy import create_engine
 from sqlalchemy.sql import select
-conf = load(open("config/config.yaml"))
+#conf = load(open("config/config.yaml"))
 conn_string = 'mysql+pymysql://root:solution-admin@10.128.0.2'
 print conn_string
 engine = create_engine(conn_string)
 
-print conf['db-host']
+#print conf['db-host']
 class AppServer(object):
     @cherrypy.expose
     def index(self):
