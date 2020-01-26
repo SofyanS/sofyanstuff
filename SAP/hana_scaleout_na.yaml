@@ -1,0 +1,65 @@
+imports:
+- path: https://storage.googleapis.com/deployalpha/dm-templates/sap_hana_scaleout/sap_hana_scaleout.py
+
+resources:
+- name: sap_hana
+  type: https://storage.googleapis.com/deployalpha/dm-templates/sap_hana_scaleout/sap_hana_scaleout.py
+  properties:
+    instanceName: hanascaleout
+    instanceType: n1-highmem-16
+    zone: us-central1-b
+    subnetwork: subnet-us-central1
+    linuxImage: family/sles-12-sp3-sap
+    linuxImageProject: suse-sap-cloud
+    sap_hana_deployment_bucket: sap-installers
+    sap_hana_sid: GCP
+    sap_hana_instance_number: 00
+    sap_hana_sidadm_password: SAPgtm123
+    sap_hana_system_password: SAPgtm123
+    sap_hana_worker_nodes: 2
+    sap_hana_standby_nodes: 1
+    sap_hana_shared_nfs: 10.194.236.34:/hana/shared
+    sap_hana_backup_nfs: 10.194.236.34:/hana/hanabackup
+    networkTag: icmp,sap-ports,sap-ssh
+    #
+    # --- Advanced Options ---
+    # The following advanced options are not usually needed. To use an advanced option, remove
+    # the comment indicator, #, before the parameter name and specify an appropriate value.
+    #
+    # networkTag: [TAG]
+    #    Adds network tags to your instance. This is useful if you do routing or define
+    #    firewall rules by tags. By default, no tags are added to your VM. Multiple tags
+    #    can be assigned by separating them with commas
+    #
+    # publicIP: [No | Yes]
+    #    Defines whether a public IP address should be added to your VM. By default this is
+    #    set to Yes. Note that if you set this to No without appropriate network nat and
+    #    tags in place, there will be no route to the internet and thus the installation will
+    #    fail.
+    #
+    # serviceAccount: [CUSTOM_SERVICE_ACCOUNT]
+    #    By default, the VM's will be deployed using the default project service account. If
+    #    you wish, you can create your own service account with locked down permissions and
+    #    specify the name of the account here. Note that an incorrectly defined service
+    #    account will prevent a successful deployment. Example of a correctly specified
+    #    custom service account: myserviceuser@myproject.iam.gserviceaccount.com
+    #
+    # sap_hana_sidadm_uid: [USER_ID]
+    #    The default value for the <sid>adm user ID is 900 to avoid user created groups conflicting
+    #    with SAP HANA. However, you may want to change this to a different value and be consistent\
+    #    across your landscape
+    #
+    # sap_hana_sapsys_gid: [GROUP_ID]
+    #    The default group ID for sapsys is 79. By specifying a value above you can overide
+    #    this value to your requirements
+    #
+    # sap_deployment_debug: [No | Yes]
+    #    Debug mode. Do not enable debug mode unless you are asked by support to turn it on.
+    #
+    # --- Developer Options ---
+    # post_deployment_script: [SCRIPT_URL]
+    #    Specifies the location of a script to run after the deployment is complete.
+    #    The script should be hosted on a web server or in a GCS bucket. The URL should
+    #    begin with http:// https:// or gs://. Note that this script will be executed
+    #    on all VM's that the template creates. If you only want to run it on the master
+    #    instance you will need to add a check at the top of your script.
