@@ -1,4 +1,3 @@
-# Install SAP HANA Studio (Can I skip this? Looks like yes)
 # Create a Filestore Instance (Check 2)
 gcloud filestore instances create hana-nfs \
     --project=$DEVSHELL_PROJECT_ID \
@@ -8,8 +7,7 @@ gcloud filestore instances create hana-nfs \
     --network=name="demonetwork"\
 
 # Configure the Filestore Instance for HANA (Check 3) - Use Startup script
-# EDIT 10.194.236.34 to Filestore IP Address. Use script to list and get filestore IP address
-# FILESTORE_IP = "10.194.236.34" # TBD Real Command (If the next line doesn't work, it's probably because FILESTORE_IP Failed)
+# Get Filestore IP
 gcloud filestore instances describe hana-nfs \
     --project=$DEVSHELL_PROJECT_ID \
     --zone=us-central1-b > fstore.txt
