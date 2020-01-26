@@ -1,6 +1,3 @@
-# Enable all APIs do this seperately in P1
-gcloud services enable file.googleapis.com
-
 # Networking Setup
 gcloud compute networks create demonetwork --subnet-mode=custom
 gcloud compute networks subnets create subnet-us-central1 --network=demonetwork --region=us-central1 --range=10.128.0.0/20
