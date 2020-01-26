@@ -1,11 +1,3 @@
-# Create a Filestore Instance (Check 2)
-gcloud filestore instances create hana-nfs \
-    --project=$DEVSHELL_PROJECT_ID \
-    --zone=us-central1-b \
-    --tier=STANDARD \
-    --file-share=name="hana",capacity=1TB \
-    --network=name="demonetwork"\
-
 # Configure the Filestore Instance for HANA (Check 3) - Use Startup script
 # Get Filestore IP
 gcloud filestore instances describe hana-nfs \
