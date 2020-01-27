@@ -8,10 +8,10 @@ gsutil mb gs://bucket_$DEVSHELL_PROJECT_ID/
 gsutil cp credentials.json gs://bucket_$DEVSHELL_PROJECT_ID/
 
 # Pull Credentials.json (I might be able to just have the file exist in github and this is unncessary)
-mkdir gdrive_api_lab
-cd gdrive_api_lab
-gsutil cp gs://bucket_$DEVSHELL_PROJECT_ID/credentials.json .
+#mkdir gdrive_api_lab
+#cd gdrive_api_lab
+#gsutil cp gs://bucket_$DEVSHELL_PROJECT_ID/credentials.json .
 
-# Create two google docs then run this
+# Create two google docs then run this in P2
 npm install
 node .
