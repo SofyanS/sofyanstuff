@@ -1,0 +1,228 @@
+# Copyright 2019 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: kbatch-admission
+  name: kbatch-admission
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: kbatch-admission
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: kbatch-admission
+    spec:
+      containers:
+      - command: ["/root/admission", "-alsologtostderr=true"]
+        image: gcr.io/kbatch/admission:kbatch-0.7.1
+        imagePullPolicy: Always
+        name: kbatch-admission-container
+        ports:
+        - containerPort: 443
+          name: https
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /tmp/cert
+          name: cert
+          readOnly: true
+      serviceAccountName: kbatch-admission
+      priorityClassName: system-cluster-critical
+      volumes:
+      - name: cert
+        secret:
+          defaultMode: 420
+          secretName: kbatch-admission-secret
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kbatch-admission
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kbatch-admission-role
+subjects:
+- kind: ServiceAccount
+  name: kbatch-admission
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kbatch-admission-role
+rules:
+  - apiGroups:
+    - authorization.k8s.io
+    resources:
+      - subjectaccessreviews
+    verbs:
+      - create
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+  - apiGroups:
+      - admissionregistration.k8s.io
+    resources:
+      - mutatingwebhookconfigurations
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - services
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+  - apiGroups:
+      - admissionregistration.k8s.io
+    resources:
+      - validatingwebhookconfigurations
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+  - apiGroups:
+      - kbatch.k8s.io
+    resources:
+      - batchnodes
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+  - apiGroups:
+      - kbatch.k8s.io
+    resources:
+      - batchbudgets
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+  - apiGroups:
+      - kbatch.k8s.io
+    resources:
+      - batchcostmodels
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+  - apiGroups:
+      - kbatch.k8s.io
+    resources:
+      - batchusercontexts
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - kbatch.k8s.io
+    resources:
+      - batchtasks
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+  - apiGroups:
+      - kbatch.k8s.io
+    resources:
+      - batchjobs
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+  - apiGroups:
+      - scheduling.k8s.io
+    resources:
+      - priorityclasses
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+  - apiGroups:
+      - kbatch.k8s.io
+    resources:
+      - batchpriorities
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+  - apiGroups:
+      - kbatch.k8s.io
+    resources:
+      - batchqueues
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+  - apiGroups:
+      - kbatch.k8s.io
+    resources:
+      - batchjobconstraints
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kbatch-admission-secret
+  namespace: kube-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kbatch-admission
+  namespace: kube-system
+---

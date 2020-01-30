@@ -1,0 +1,168 @@
+[
+    {
+      "mode": "NULLABLE", 
+      "name": "fileid", 
+      "type": "STRING"
+    }, 
+    {
+      "mode": "NULLABLE", 
+      "name": "filename", 
+      "type": "STRING"
+    }, 
+    {
+      "mode": "NULLABLE", 
+      "name": "agentid", 
+      "type": "STRING"
+    }, 
+    {
+      "mode": "NULLABLE", 
+      "name": "date", 
+      "type": "STRING"
+    }, 
+    {
+      "mode": "NULLABLE", 
+      "name": "year", 
+      "type": "INTEGER"
+    }, 
+    {
+      "mode": "NULLABLE", 
+      "name": "month", 
+      "type": "INTEGER"
+    }, 
+    {
+      "mode": "NULLABLE", 
+      "name": "day", 
+      "type": "INTEGER"
+    }, 
+    {
+      "mode": "NULLABLE", 
+      "name": "starttime", 
+      "type": "STRING"
+    }, 
+    {
+      "mode": "NULLABLE", 
+      "name": "duration", 
+      "type": "INTEGER"
+    }, 
+    {
+      "mode": "NULLABLE", 
+      "name": "silencesecs", 
+      "type": "FLOAT"
+    }, 
+    {
+      "mode": "NULLABLE", 
+      "name": "silencevalue", 
+      "type": "FLOAT"
+    }, 
+    {
+      "mode": "NULLABLE", 
+      "name": "sentimentscore", 
+      "type": "FLOAT"
+    }, 
+    {
+      "mode": "NULLABLE", 
+      "name": "silencescore", 
+      "type": "INTEGER"
+    }, 
+    {
+      "mode": "NULLABLE", 
+      "name": "agentspeaking", 
+      "type": "FLOAT"
+    }, 
+    {
+      "mode": "NULLABLE", 
+      "name": "clientspeaking", 
+      "type": "FLOAT"
+    }, 
+    {
+      "mode": "NULLABLE", 
+      "name": "nlcategory", 
+      "type": "STRING"
+    }, 
+    {
+      "mode": "NULLABLE", 
+      "name": "magnitude", 
+      "type": "FLOAT"
+    }, 
+    {
+      "mode": "NULLABLE", 
+      "name": "transcript", 
+      "type": "STRING"
+    }, 
+    {
+      "fields": [
+        {
+          "mode": "NULLABLE", 
+          "name": "name", 
+          "type": "STRING"
+        }, 
+        {
+          "mode": "NULLABLE", 
+          "name": "type", 
+          "type": "STRING"
+        }, 
+        {
+          "mode": "NULLABLE", 
+          "name": "sentiment", 
+          "type": "FLOAT"
+        }
+      ], 
+      "mode": "REPEATED", 
+      "name": "entities", 
+      "type": "RECORD"
+    }, 
+    {
+      "fields": [
+        {
+          "mode": "NULLABLE", 
+          "name": "word", 
+          "type": "STRING"
+        }, 
+        {
+          "mode": "NULLABLE", 
+          "name": "startSecs", 
+          "type": "FLOAT"
+        }, 
+        {
+          "mode": "NULLABLE", 
+          "name": "endSecs", 
+          "type": "FLOAT"
+        }, 
+        {
+          "mode": "NULLABLE", 
+          "name": "speakertag", 
+          "type": "INTEGER"
+        }, 
+        {
+          "mode": "NULLABLE", 
+          "name": "confidence", 
+          "type": "FLOAT"
+        }
+      ], 
+      "mode": "REPEATED", 
+      "name": "words", 
+      "type": "RECORD"
+    }, 
+    {
+      "fields": [
+        {
+          "mode": "NULLABLE", 
+          "name": "sentence", 
+          "type": "STRING"
+        }, 
+        {
+          "mode": "NULLABLE", 
+          "name": "score", 
+          "type": "FLOAT"
+        }, 
+        {
+          "mode": "NULLABLE", 
+          "name": "magnitude", 
+          "type": "FLOAT"
+        }
+      ], 
+      "mode": "REPEATED", 
+      "name": "sentences", 
+      "type": "RECORD"
+    }
+  ]

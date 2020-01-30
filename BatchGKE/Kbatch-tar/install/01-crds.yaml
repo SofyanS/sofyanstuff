@@ -1,0 +1,961 @@
+# Copyright 2019 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: batchbudgets.kbatch.k8s.io
+spec:
+  group: kbatch.k8s.io
+  names:
+    kind: BatchBudget
+    plural: batchbudgets
+  scope: Cluster
+  validation:
+    openAPIV3Schema:
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          properties:
+            batchCostModelName:
+              description: 'Important: Run "make" to regenerate code after modifying
+                this file Name of the BatchCostModel used by this budget.'
+              type: string
+            budgetStartTime:
+              description: Start Time of the first window in the budget. This is populated
+                as budget creation time if not set.
+              format: date-time
+              type: string
+            budgetWindows:
+              description: An array of windows each defining a budget amount limit
+                for that window. BudgetWindows[i].Duration must be unique within BudgetWindows.
+              items:
+                properties:
+                  amount:
+                    description: Amount is the limit for budget within this window.
+                    format: double
+                    type: number
+                  duration:
+                    description: Duration conveys window size. At this time only days
+                      are supported so the values will have only suffix "d" for days.
+                      In future support for any duration unit such as hour, week etc
+                      will be added.
+                    type: string
+                required:
+                - duration
+                - amount
+                type: object
+              type: array
+          required:
+          - batchCostModelName
+          type: object
+        status:
+          properties:
+            LastUpdated:
+              description: 'Important: Run "make" to regenerate code after modifying
+                this file Time at which the this section was last updated.'
+              format: date-time
+              type: string
+            windowStatusList:
+              description: WindowStatusList contains one entry for each window to
+                convey detailed status. WindowStatusList[i].Start <= time.Now() must
+                hold. +patchMergeKey=duration +patchStrategy=merge
+              items:
+                properties:
+                  amount:
+                    description: Amount of budget used within the current window.
+                    format: double
+                    type: number
+                  duration:
+                    description: Duration conveys window size. At this time only days
+                      are supported so the values will have only suffix "d" for days.
+                      In future support for any duration unit such as hour, week etc
+                      will be added.
+                    type: string
+                  startTime:
+                    description: Start time of the current window. Once the window
+                      ends it is added to the History and a new current window is
+                      created.
+                    format: date-time
+                    type: string
+                  windowHistory:
+                    description: For each complete window of this duration this list
+                      tracks the amount of budget used in that window. For Alpha we
+                      keep 90 days of history for daily window and 3 records of history
+                      for 30-day window.
+                    items:
+                      properties:
+                        amount:
+                          description: Amount of budget used within this window.
+                          format: double
+                          type: number
+                        windowEndTime:
+                          description: End time of the window.
+                          format: date-time
+                          type: string
+                        windowStartTime:
+                          description: Start time of the window.
+                          format: date-time
+                          type: string
+                      required:
+                      - windowStartTime
+                      - windowEndTime
+                      - amount
+                      type: object
+                    type: array
+                required:
+                - duration
+                - startTime
+                - amount
+                type: object
+              type: array
+          type: object
+  version: v1beta1
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: batchcostmodels.kbatch.k8s.io
+spec:
+  group: kbatch.k8s.io
+  names:
+    kind: BatchCostModel
+    plural: batchcostmodels
+  scope: Cluster
+  validation:
+    openAPIV3Schema:
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          properties:
+            resources:
+              type: object
+          type: object
+        status:
+          type: object
+  version: v1beta1
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: batchjobconstraints.kbatch.k8s.io
+spec:
+  group: kbatch.k8s.io
+  names:
+    kind: BatchJobConstraint
+    plural: batchjobconstraints
+  scope: Cluster
+  validation:
+    openAPIV3Schema:
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          properties:
+            constraints:
+              items:
+                properties:
+                  name:
+                    description: Field denotes the Batch task field that is under
+                      consideration
+                    type: string
+                  operator:
+                    description: Operator holds the operation to be applied
+                    type: string
+                  values:
+                    description: Values is one of the field that is under consideration
+                    items:
+                      type: string
+                    type: array
+                required:
+                - name
+                - operator
+                type: object
+              type: array
+          type: object
+        status:
+          type: object
+  version: v1beta1
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: batchjobs.kbatch.k8s.io
+spec:
+  group: kbatch.k8s.io
+  names:
+    kind: BatchJob
+    plural: batchjobs
+  scope: Namespaced
+  validation:
+    openAPIV3Schema:
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: Job spec
+          properties:
+            batchQueueName:
+              description: The name of the BatchQueue under which this BatchJob will
+                run.
+              type: string
+            dependencies:
+              description: 'Dependencies defines multiple BatchJob dependencies. The
+                logic between each dependency is “OR” operation. For example:   Dependencies[0]   Dependencies[1]
+                The logic between Dependencies[0] and Dependencies[1] is:   Dependencies[0]
+                || Dependencies[1] We only support one Dependency for now.'
+              items:
+                properties:
+                  dependencyItems:
+                    description: "In one dependency, the logic between each item is
+                      “AND”. For example: \t\tDependencyItems[0] \t\tDependencyItems[1]
+                      \t\tDependencyItems[2] The implicit logic is that: DependencyItems[0]
+                      && DependencyItems[1] && DependencyItems[2]. We only support
+                      one Dependency Item for now."
+                    items:
+                      properties:
+                        names:
+                          description: The target dependency names for BatchJob.
+                          items:
+                            type: string
+                          type: array
+                        type:
+                          description: The target dependency type for BatchJob.
+                          type: string
+                      type: object
+                    type: array
+                type: object
+              type: array
+            taskGroups:
+              description: Task group spec
+              items:
+                properties:
+                  indexSpec:
+                    description: IndexSpec defines the task index range. If not specified,
+                      this is a single task group.
+                    properties:
+                      taskCount:
+                        description: Number of tasks.
+                        format: int32
+                        type: integer
+                    type: object
+                  maxWallTime:
+                    description: 'Per task max execution time in a single execution
+                      (single retry). The format is a number with single time unit
+                      of m(minutes), h(hours) and d(days), Accepted string example:
+                      1h, 50m, 1d. Combination like "5h30m" of the  time unit is not
+                      support. Required to be a non-empty string for budget estimation
+                      purpose.'
+                    type: string
+                  name:
+                    description: Name of this group
+                    type: string
+                  retryLimit:
+                    description: RetryLimit defines the per task retry limit. The
+                      task execution times will be RetryLimit + 1 if not specified,
+                      default is 0
+                    format: int32
+                    type: integer
+                  template:
+                    description: Template describes the pod that will be used in this
+                      group
+                    type: object
+                type: object
+              type: array
+            userCommand:
+              description: UserCommand of BatchJob. Default is empty string. If this
+                field is empty, there is no user command from the end user. If it
+                is set to "Terminate" while BatchJob is running, terminate the BatchJob
+              type: string
+          type: object
+        status:
+          description: Job status. This field has to be a pointer, optional, and omitempty;
+            otherwise, the webhook mutator will not function properly. See https://groups.google.com/a/google.com/forum/#!topic/big-compute-team/FHZnn0TRzNQ
+          properties:
+            batchPriority:
+              description: A copy of the BatchPriority resource associated with this
+                BatchJob (based on the batchPriorityName declared in the BatchQueue
+                associated with this BatchJob). We require this to be a pointer, optional,
+                and omitempty; otherwise, the webhook mutator will not function properly.
+                See https://groups.google.com/a/google.com/forum/#!topic/big-compute-team/FHZnn0TRzNQ
+              properties:
+                apiVersion:
+                  description: 'APIVersion defines the versioned schema of this representation
+                    of an object. Servers should convert recognized schemas to the
+                    latest internal value, and may reject unrecognized values. More
+                    info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+                  type: string
+                kind:
+                  description: 'Kind is a string value representing the REST resource
+                    this object represents. Servers may infer this from the endpoint
+                    the client submits requests to. Cannot be updated. In CamelCase.
+                    More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+                  type: string
+                metadata:
+                  type: object
+                spec:
+                  properties:
+                    description:
+                      type: string
+                    value:
+                      format: int32
+                      type: integer
+                  required:
+                  - value
+                  - description
+                  type: object
+                status:
+                  type: object
+              type: object
+            budgetConsumed:
+              description: Aggregated budget consumed for job including all it's tasks.
+              format: double
+              type: number
+            conditions:
+              description: The latest available observations of the batchjob's current
+                state. +patchMergeKey=type +patchStrategy=merge
+              items:
+                properties:
+                  message:
+                    description: Human readable message indicating details about last
+                      transition.
+                    type: string
+                  reason:
+                    description: (brief) reason for the condition's last transition.
+                    type: string
+                  status:
+                    description: Status of the condition, one of True, False, Unknown.
+                    type: string
+                  time:
+                    description: Time of the condition.
+                    format: date-time
+                    type: string
+                  type:
+                    description: Type of job condition.
+                    type: string
+                required:
+                - type
+                - status
+                type: object
+              type: array
+            groupStatus:
+              description: status per task group.
+              type: object
+            phase:
+              description: The current phase of this job.
+              type: string
+            submittedBy:
+              description: The user who submitted the job
+              type: string
+          type: object
+  version: v1beta1
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: batchnodes.kbatch.k8s.io
+spec:
+  group: kbatch.k8s.io
+  names:
+    kind: BatchNode
+    plural: batchnodes
+  scope: Cluster
+  validation:
+    openAPIV3Schema:
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          properties:
+            capacity:
+              description: Capacity of the associated Node. This is only set for custom
+                Class.
+              type: object
+            class:
+              properties:
+                name:
+                  type: string
+                provider:
+                  type: string
+              required:
+              - name
+              - provider
+              type: object
+            extraResources:
+              description: ExtraResources represents extra resources such as GPU.
+              type: object
+            location:
+              description: Provider specific location information of the BatchNode
+              type: string
+            taints:
+              description: Taints on the Node associated with the BatchNode.
+              items:
+                type: object
+              type: array
+          required:
+          - class
+          type: object
+        status:
+          properties:
+            conditions:
+              description: Conditions is an array of current observed BatchNode conditions.
+              items:
+                properties:
+                  lastUpdateTime:
+                    description: Last time we update a given condition.
+                    format: date-time
+                    type: string
+                  message:
+                    description: Human readable message indicating details about last
+                      transition.
+                    type: string
+                  reason:
+                    description: Brief reason for the condition's last transition.
+                    type: string
+                  status:
+                    description: Status of the condition, one of True, False, Unknown.
+                    type: string
+                  type:
+                    description: Type of node condition.
+                    type: string
+                required:
+                - type
+                - status
+                type: object
+              type: array
+            lastUpdated:
+              description: LastUpdated identifies when this status was last observed.
+              format: date-time
+              type: string
+            phase:
+              description: Phase is the latest lifecycle phase of the BatchNode.
+              type: string
+            retries:
+              description: Retries contains retried operations. One entry per type.
+              type: object
+          type: object
+  version: v1beta1
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: batchpriorities.kbatch.k8s.io
+spec:
+  group: kbatch.k8s.io
+  names:
+    kind: BatchPriority
+    plural: batchpriorities
+  scope: Cluster
+  validation:
+    openAPIV3Schema:
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          properties:
+            description:
+              type: string
+            value:
+              format: int32
+              type: integer
+          required:
+          - value
+          - description
+          type: object
+        status:
+          type: object
+  version: v1beta1
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: batchqueues.kbatch.k8s.io
+spec:
+  group: kbatch.k8s.io
+  names:
+    kind: BatchQueue
+    plural: batchqueues
+  scope: Namespaced
+  validation:
+    openAPIV3Schema:
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          properties:
+            batchBudgetName:
+              description: The name of the BatchBudget resource associated with this
+                BatchQueue.
+              type: string
+            batchPriorityName:
+              description: The name of the BatchPriority resource associated with
+                this BatchQueue. Jobs in this BatchQueue will be prioritized for scheduling
+                based on the BatchPriority set here.
+              type: string
+            constraintNames:
+              description: ConstraintNames holds names of BatchJobConstraints to be
+                applied to the queue
+              items:
+                type: string
+              type: array
+            pauseAdmission:
+              description: If true, the BatchQueue will not accept new jobs. This
+                does not affect scheduling of jobs.
+              type: boolean
+            pauseScheduling:
+              description: If true, the BatchQueue will not schedule jobs. This does
+                not affect admission of jobs.
+              type: boolean
+          required:
+          - batchPriorityName
+          - batchBudgetName
+          type: object
+        status:
+          properties:
+            jobs:
+              properties:
+                lastUpdated:
+                  description: Time at which the this section was last updated.
+                  format: date-time
+                  type: string
+                phaseCounts:
+                  description: Count of jobs in each non-terminal phase.
+                  type: object
+              type: object
+          type: object
+  version: v1beta1
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: batchtasks.kbatch.k8s.io
+spec:
+  group: kbatch.k8s.io
+  names:
+    kind: BatchTask
+    plural: batchtasks
+  scope: Namespaced
+  validation:
+    openAPIV3Schema:
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          properties:
+            batchQueueName:
+              description: The name of the BatchQueue under which this BatchTask will
+                run.
+              type: string
+            dependencies:
+              description: 'Dependencies defines multiple BatchTask dependencies.
+                The logic between each dependency is “OR” operation. For example:   Dependencies[0]   Dependencies[1]
+                The logic between Dependencies[0] and Dependencies[1] is:   Dependencies[0]
+                || Dependencies[1] We only support one Dependency for now.'
+              items:
+                properties:
+                  dependencyItems:
+                    description: "In one dependency, the logic between each item is
+                      “AND”. For example: \t\tDependencyItems[0] \t\tDependencyItems[1]
+                      \t\tDependencyItems[2] The implicit logic is that: DependencyItems[0]
+                      && DependencyItems[1] && DependencyItems[2]. We only support
+                      one Dependency Item for now."
+                    items:
+                      properties:
+                        names:
+                          description: The target dependency names for BatchTask.
+                          items:
+                            type: string
+                          type: array
+                        type:
+                          description: The target dependency type for BatchTask.
+                          type: string
+                      type: object
+                    type: array
+                type: object
+              type: array
+            expectedPhase:
+              description: Expected phase of BatchTask. Default is empty string. If
+                this field is empty, there is no expected phase from the end user.
+                If it is set to "Failed" while BatchTask is running, terminate the
+                BatchTask
+              type: string
+            maxWallTime:
+              description: 'Max execution time in a single execution (single retry),
+                not including the queue waiting time. The format is a number with
+                single time unit of m(minutes), h(hours) and d(days), Accepted string
+                example: 1h, 50m, 1d. Combination like "5h30m" of the  time unit is
+                not support. Required to be a non-empty string for budget estimation
+                purpose. TODO(b/116642439): consider switch to use Duration.'
+              type: string
+            retryLimit:
+              description: Retry limit. Default is 1 when this filed is empty. The
+                total task execution times will be RetryLimit + 1 if not specified,
+                default is 0
+              format: int32
+              type: integer
+            template:
+              description: Describes the pod that will be created when executing a
+                task.
+              type: object
+            userCommand:
+              description: UserCommand of BatchTask. Default is empty string. If this
+                field is empty, there is no user command from the end user. If it
+                is set to "Terminate" while BatchTask is running, terminate the BatchTask
+              type: string
+          type: object
+        status:
+          description: 'We require this to be a pointer, optional, and omitempty;
+            otherwise, the webhook mutator will not function properly. See https://groups.google.com/a/google.com/forum/#!topic/big-compute-team/FHZnn0TRzNQ
+            TODO(b/111887579): Fixing this bug might solve the pointer issue.'
+          properties:
+            batchPriority:
+              description: 'A copy of the BatchPriority resource associated with this
+                BatchTask (based on the batchPriorityName declared in the BatchQueue
+                associated with this BatchTask). We require this to be a pointer,
+                optional, and omitempty; otherwise, the webhook mutator will not function
+                properly. See https://groups.google.com/a/google.com/forum/#!topic/big-compute-team/FHZnn0TRzNQ
+                TODO(b/111887579): Fixing this bug might solve the pointer issue.'
+              properties:
+                apiVersion:
+                  description: 'APIVersion defines the versioned schema of this representation
+                    of an object. Servers should convert recognized schemas to the
+                    latest internal value, and may reject unrecognized values. More
+                    info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+                  type: string
+                kind:
+                  description: 'Kind is a string value representing the REST resource
+                    this object represents. Servers may infer this from the endpoint
+                    the client submits requests to. Cannot be updated. In CamelCase.
+                    More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+                  type: string
+                metadata:
+                  type: object
+                spec:
+                  properties:
+                    description:
+                      type: string
+                    value:
+                      format: int32
+                      type: integer
+                  required:
+                  - value
+                  - description
+                  type: object
+                status:
+                  type: object
+              type: object
+            budgetConsumed:
+              description: The amount in USD consumed by all the runs of this task
+                calculated after it is in a terminal phase (Failed / Succeeded).
+              format: double
+              type: number
+            conditions:
+              description: The latest available observations of the batchtask's current
+                state. +patchMergeKey=type +patchStrategy=merge
+              items:
+                properties:
+                  message:
+                    description: Human readable message indicating details about last
+                      transition.
+                    type: string
+                  reason:
+                    description: (brief) reason for the condition's last transition.
+                    type: string
+                  status:
+                    description: Status of the condition, one of True, False, Unknown.
+                    type: string
+                  time:
+                    description: Time of the condition.
+                    format: date-time
+                    type: string
+                  type:
+                    description: Type of task condition.
+                    type: string
+                required:
+                - type
+                - status
+                type: object
+              type: array
+            failedCount:
+              description: The number of pods which reached phase Failed.
+              format: int64
+              type: integer
+            phase:
+              description: The current phase of this task in its state machine transaction.
+              type: string
+            submittedBy:
+              description: The user who submitted the task
+              type: string
+            taskRuns:
+              description: Information about every task execution TODO(b/112468698)
+                consider merging this field with the FailedCount +patchMergeKey=count
+                +patchStrategy=merge
+              items:
+                properties:
+                  conditions:
+                    description: The latest available conditions of the task run's
+                      current state. +patchMergeKey=type +patchStrategy=merge
+                    items:
+                      properties:
+                        message:
+                          description: Human readable message indicating details about
+                            last transition.
+                          type: string
+                        reason:
+                          description: (brief) reason for the condition's last transition.
+                          type: string
+                        status:
+                          description: Status of the condition, one of True, False,
+                            Unknown.
+                          type: string
+                        time:
+                          description: Time of the condition.
+                          format: date-time
+                          type: string
+                        type:
+                          description: Type of task condition.
+                          type: string
+                      required:
+                      - type
+                      - status
+                      type: object
+                    type: array
+                  endTime:
+                    description: end time of this run, either successful or failure
+                    format: date-time
+                    type: string
+                  lastPodPhase:
+                    description: Last observed pod phase
+                    type: string
+                  podId:
+                    description: The id of the pod this run
+                    type: string
+                  podName:
+                    description: The name of the pod this run
+                    type: string
+                  startTime:
+                    description: Start time of this run
+                    format: date-time
+                    type: string
+                type: object
+              type: array
+          type: object
+  version: v1beta1
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: batchusercontexts.kbatch.k8s.io
+spec:
+  group: kbatch.k8s.io
+  names:
+    kind: BatchUserContext
+    plural: batchusercontexts
+  scope: Namespaced
+  validation:
+    openAPIV3Schema:
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          properties:
+            securityPolicySpec:
+              description: 'The pod security policy spec for this user. Using PSP
+                spec to limit what user can specify in their task spec. Note: if unspecified,
+                the user will be free to specify anything in the PodSecurityContext
+                and Container SecurityContext.'
+              type: object
+            userName:
+              description: Kubernetes user name
+              type: string
+          required:
+          - userName
+          type: object
+        status:
+          type: object
+  version: v1beta1
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
