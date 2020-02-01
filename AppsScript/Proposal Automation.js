@@ -8,8 +8,8 @@ function onOpen(e) {
 
 function proposalAutomation() {
   //Template Variables
-  DOC_TEMPLATE_ID = "1QwXNuKA9oGWwDRnAt5TPEzFJ6kfkGPL2PKr1bq5Pi2E";
-  FOLDER_ID = "1nLGDlJDfNtJd7r-B-vKfAUvPKOyux7NT";
+  DOC_TEMPLATE_ID = "1Casv2igPfFdXe7ef0Yt5qzy6sHkkUUCHP7tkLvoQ7j4";
+  FOLDER_ID = "1E-SXcDnGED__S9eNJUrkNbL2122UehAC";
 
   //Calculate Discount Pricing
   var sheet = SpreadsheetApp.getActiveSheet();
