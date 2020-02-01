@@ -58,13 +58,13 @@ function proposalAutomation() {
     DriveApp.getFolderById(FOLDER_ID).addFile(pdfFile);
     pdfFile.setName(custName);
     sheet.getRange(2+i, 8).setValue("Proposal Created Successfully");
-    sheet.getRange(2+i, 8).setValue(pdfFile.getUrl());
     copyFile.setTrashed(true);
     
     // Create Gmail Draft
-    GmailApp.createDraft(custEmail, "Quote for " + custName, 'Please see attached file for your GSuite Quote', {
+    GmailApp.createDraft(custEmail, 'Attachment example', 'Please see attached file.', {
     attachments: [pdfFile],
     name: 'Automatic Emailer Script'
     }); 
   }
 }
+

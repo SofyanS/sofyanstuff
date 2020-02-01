@@ -8,8 +8,8 @@ function onOpen(e) {
 
 function proposalAutomation() {
   //Template Variables
-  DOC_TEMPLATE_ID = "1gMLjt0ReXhn6FNICqaAB9DBcJvLHe6RnmS2Rzg-yhew";
-  FOLDER_ID = "1z1XB_G5k1Fl1pJ1meX8kXkfxWhRqf5dI";
+  DOC_TEMPLATE_ID = "1QwXNuKA9oGWwDRnAt5TPEzFJ6kfkGPL2PKr1bq5Pi2E";
+  FOLDER_ID = "1nLGDlJDfNtJd7r-B-vKfAUvPKOyux7NT";
 
   //Calculate Discount Pricing
   var sheet = SpreadsheetApp.getActiveSheet();
@@ -56,7 +56,7 @@ function proposalAutomation() {
     copyDoc.saveAndClose();
     var pdfFile = DriveApp.createFile(copyFile.getAs('application/pdf'))
     DriveApp.getFolderById(FOLDER_ID).addFile(pdfFile);
-    pdfFile.setName(custName);
+    pdfFile.setName("G Suite Proposal for " + custName);
     sheet.getRange(2+i, 8).setValue("Proposal Created Successfully");
     sheet.getRange(2+i, 8).setValue(pdfFile.getUrl());
     copyFile.setTrashed(true);
